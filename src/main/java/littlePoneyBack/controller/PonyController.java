@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,29 +22,31 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import littlePoneyBack.DAO.PonyDAO;
-import littlePoneyBack.exception.PonyException;
+import littlePoneyBack.exception.PonyCudException;
+import littlePoneyBack.exception.PonyNotFoundException;
 import littlePoneyBack.model.Pony;
 
-@RestController("/pony")
+@RestController
+@RequestMapping("/api/ponies")
 public class PonyController {
 	@Autowired
 	PonyDAO ponyDAO;
 
-	@GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public List<Pony> getPonies() throws PonyException {
+	public List<Pony> getPonies() throws PonyNotFoundException {
 		LinkedList<Pony> lp= new LinkedList<>();
 		Iterable<Pony> o = ponyDAO.findAll();
 		o.forEach(v -> {lp.push(v);});
 		return lp;
 	}
 	
-	@GetMapping(value = "/search/create", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Pony getPony(@RequestParam("id") int id) throws PonyException {
+	public Pony getPonyById(@PathVariable("id") int id) throws PonyNotFoundException {
 		Optional<Pony> o = ponyDAO.findById(id);
 		if (!o.isPresent()) {
-			throw new PonyException();
+			throw new PonyNotFoundException("Poney introuvable");
 
 		} else {
 			return (Pony) o.get();
@@ -63,12 +66,10 @@ public class PonyController {
 		return Pony;
 	}
 
-	@PostMapping
-
 	@RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public Pony update(@RequestBody @Valid Pony pony, BindingResult bindingResult) throws PonyException {
+	public Pony update(@RequestBody @Valid Pony pony, BindingResult bindingResult) throws PonyNotFoundException {
 		if (bindingResult.hasErrors()) {
 			// gérer ses erreurs
 			System.out.println(bindingResult.getErrorCount());
@@ -78,7 +79,7 @@ public class PonyController {
 		if (getPony.isPresent()) {
 			ponyFromBD = ponyDAO.findById(pony.getId()).get();
 		} else {
-			throw new PonyException();
+			throw new PonyNotFoundException("Poney introuvable");
 		}
 
 		ponyFromBD.setAge(pony.getAge());
@@ -89,10 +90,10 @@ public class PonyController {
 		return ponyFromBD;
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(method = RequestMethod.DELETE,value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public String delete(@RequestBody @Valid int id, BindingResult bindingResult) throws PonyException {
+	public String delete(@PathVariable("id") int id) throws PonyNotFoundException, PonyCudException {
 		Optional<Pony> obsderveAvantDestruction = ponyDAO.findById(id);
 		
 		if(obsderveAvantDestruction.isPresent()) {
@@ -102,11 +103,11 @@ public class PonyController {
 				return "Element Supprimé";
 			}else {
 				//TODO : Retravailler l'exception
-				throw new PonyException();
+				throw new PonyCudException("Echec de l'opération, l'élément n'a pas été supprimé.");
 			}
 			
 		}else {
-			throw new PonyException();
+			throw new PonyNotFoundException("L'élément que vous cherchez à supprimer n'a pas été trouvé.");
 		}
 		
 	}

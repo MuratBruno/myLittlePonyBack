@@ -13,9 +13,9 @@ import org.springframework.context.support.AbstractApplicationContext;
 import littlePoneyBack.DAO.PonyDAO;
 import littlePoneyBack.model.Pony;
 
-@Configuration
-@ComponentScan(basePackages= {"littlePoneyBack","littlePoneyBack.DAO","littlePoneyBack.controller","littlePoneyBack.model","littlePoneyBack.exception","littlePoneyBack.config"})
-//@SpringBootApplication
+//@Configuration
+//@ComponentScan(basePackages= {"littlePoneyBack","littlePoneyBack.DAO","littlePoneyBack.controller","littlePoneyBack.model","littlePoneyBack.exception","littlePoneyBack.config"})
+@SpringBootApplication
 public class App {
 
 	
