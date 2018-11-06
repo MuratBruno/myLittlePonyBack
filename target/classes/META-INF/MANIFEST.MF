@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: formation
+Build-Jdk: 10.0.2
+Implementation-Title: littlePoneyBack
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: fr.dtaIngenierie
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/littlePoneyBack
+Created-By: Maven Integration for Eclipse
+
