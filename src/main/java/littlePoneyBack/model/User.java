@@ -1,60 +1,64 @@
 package littlePoneyBack.model;
 
+import java.io.Serializable;
+import java.util.Collection;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 @Entity
-@Table(name="User")
-public class User {
+@Table(name = "USER_PONY")
+public class User implements Serializable , UserDetails {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1675347553176926401L;
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
-	private String login;
-	private String password;
-	
-	public User() {
-		super();
-	}
-
-	
-	public User(int id, String login, String password) {
-		super();
-		this.id = id;
-		this.login = login;
-		this.password = password;
-	}
-
-
-
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", login=" + login + ", password=" + password + "]";
-	}
-
-
-	public String getLogin() {
-		return login;
-	}
-	public void setLogin(String login) {
-		this.login = login;
-	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer userId;
+    private String username;
+    private String password;
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+    public String getUsername() {
+        return username;
+    }
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

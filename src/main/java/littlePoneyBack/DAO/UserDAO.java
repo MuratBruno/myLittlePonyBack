@@ -41,7 +41,7 @@ public class UserDAO  {
 	}
 	
 	public Optional<User> findByLogin(String login) {
-		TypedQuery<User> query = em.createQuery("select distinct u from User u where u.login = '" + login+"'", User.class);
+		TypedQuery<User> query = em.createQuery("select distinct u from User u where u.username = '" + login+"'", User.class);
 
 		Optional<User> o =  Optional.ofNullable(query.getSingleResult());
 		return o;
@@ -74,7 +74,7 @@ public class UserDAO  {
 		}
 		if (listId.length() > 0) {
 			listId = "(" + listId + ")";
-			TypedQuery<User> query = em.createQuery("select distinct u from User u where id in" + listId, User.class);
+			TypedQuery<User> query = em.createQuery("select distinct u from User u where u.userId in" + listId, User.class);
 			List<User> Users = query.getResultList();
 
 			return Users;

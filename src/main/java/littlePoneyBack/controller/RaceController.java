@@ -31,14 +31,14 @@ import littlePoneyBack.model.Race;
 @RequestMapping("/api/races")
 public class RaceController {
 	@Autowired
-	RaceDAO RaceDAO;
+	RaceDAO raceDAO;
 
 	@CrossOrigin(origins = "*")
 	@GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Race> getPonies() throws RaceNotFoundException {
 		LinkedList<Race> lp= new LinkedList<>();
-		Iterable<Race> o = RaceDAO.findAll();
+		Iterable<Race> o = raceDAO.findAll();
 		o.forEach(v -> {lp.push(v);});
 		return lp;
 	}
@@ -47,7 +47,7 @@ public class RaceController {
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Race getRaceById(@PathVariable("id") int id) throws RaceNotFoundException {
-		Optional<Race> o = RaceDAO.findById(id);
+		Optional<Race> o = raceDAO.findById(id);
 		if (!o.isPresent()) {
 			throw new RaceNotFoundException("Poney introuvable");
 
@@ -67,7 +67,7 @@ public class RaceController {
 			System.out.println(bindingResult.getErrorCount());
 		}
 		System.out.println(Race.toString());
-		RaceDAO.save(Race);
+		raceDAO.save(Race);
 		return Race;
 	}
 
@@ -80,18 +80,18 @@ public class RaceController {
 			// gérer ses erreurs
 			System.out.println(bindingResult.getErrorCount());
 		}
-		Optional<Race> getRace = RaceDAO.findById(Race.getId());
+		Optional<Race> getRace = raceDAO.findById(Race.getId());
 		Race RaceFromBD;
 		if (getRace.isPresent()) {
-			RaceFromBD = RaceDAO.findById(Race.getId()).get();
+			RaceFromBD = raceDAO.findById(Race.getId()).get();
 		} else {
-			throw new RaceNotFoundException("Poney introuvable");
+			throw new RaceNotFoundException("Race introuvable");
 		}
 
 		RaceFromBD.setLocation(Race.getLocation());
 		RaceFromBD.setDate(Race.getDate());
 		RaceFromBD.setPonies(Race.getPonies());
-		RaceDAO.save(RaceFromBD);
+		raceDAO.save(RaceFromBD);
 		return RaceFromBD;
 	}
 
@@ -100,11 +100,11 @@ public class RaceController {
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
 	public Message delete(@PathVariable("id") int id) throws RaceNotFoundException, RaceCudException {
-		Optional<Race> obsderveAvantDestruction = RaceDAO.findById(id);
+		Optional<Race> obsderveAvantDestruction = raceDAO.findById(id);
 		
 		if(obsderveAvantDestruction.isPresent()) {
-			RaceDAO.deleteById(id);
-			Optional<Race> obsderveAprestDestruction = RaceDAO.findById(id);
+			raceDAO.deleteById(id);
+			Optional<Race> obsderveAprestDestruction = raceDAO.findById(id);
 			if(!obsderveAprestDestruction.isPresent()) {
 				return new Message("Élément supprimé", false);
 			}else {
