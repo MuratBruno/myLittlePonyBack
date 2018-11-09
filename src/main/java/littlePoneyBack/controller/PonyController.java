@@ -1,15 +1,20 @@
 package littlePoneyBack.controller;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,9 +27,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import littlePoneyBack.DAO.PonyDAO;
+import littlePoneyBack.DAO.RaceDAO;
 import littlePoneyBack.exception.PonyCudException;
 import littlePoneyBack.exception.PonyNotFoundException;
 import littlePoneyBack.model.Pony;
+import littlePoneyBack.model.Race;
 
 @RestController
 @RequestMapping("/api/ponies")
@@ -32,15 +39,22 @@ public class PonyController {
 	@Autowired
 	PonyDAO ponyDAO;
 
+	@Autowired
+	RaceDAO raceDAO;
+
+	@CrossOrigin(origins = "*")
 	@GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Pony> getPonies() throws PonyNotFoundException {
-		LinkedList<Pony> lp= new LinkedList<>();
+		LinkedList<Pony> lp = new LinkedList<>();
 		Iterable<Pony> o = ponyDAO.findAll();
-		o.forEach(v -> {lp.push(v);});
+		o.forEach(v -> {
+			lp.push(v);
+		});
 		return lp;
 	}
-	
+
+	@CrossOrigin(origins = "*")
 	@GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Pony getPonyById(@PathVariable("id") int id) throws PonyNotFoundException {
@@ -53,6 +67,7 @@ public class PonyController {
 		}
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
@@ -66,6 +81,7 @@ public class PonyController {
 		return Pony;
 	}
 
+	@CrossOrigin(origins = "*")
 	@RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
@@ -90,27 +106,44 @@ public class PonyController {
 		return ponyFromBD;
 	}
 
-	@RequestMapping(method = RequestMethod.DELETE,value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@CrossOrigin(origins = "*")
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public String delete(@PathVariable("id") int id) throws PonyNotFoundException, PonyCudException {
-		Optional<Pony> obsderveAvantDestruction = ponyDAO.findById(id);
-		
-		if(obsderveAvantDestruction.isPresent()) {
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	public Message delete(@PathVariable("id") int id) throws PonyNotFoundException, PonyCudException {
+		Optional<Pony> observeAvantDestruction = ponyDAO.findById(id);
+
+		if (observeAvantDestruction.isPresent()) {
+
+			/*ArrayList<Race> lr = (ArrayList<Race>) raceDAO.findAll();
+			
+	
+			lr.forEach((race) -> {
+				List<Pony> poneysFiltrees = race.getPonies().stream().filter((pony) -> {
+					return pony.getId() != id;
+				}).collect(Collectors.toList());
+				race.setPonies(poneysFiltrees);
+				raceDAO.save(race);
+			});*/
+
 			ponyDAO.deleteById(id);
-			Optional<Pony> obsderveAprestDestruction = ponyDAO.findById(id);
-			if(!obsderveAprestDestruction.isPresent()) {
-				return "Element Supprimé";
-			}else {
-				//TODO : Retravailler l'exception
+
+			
+			
+			
+			
+			Optional<Pony> observeApresDestruction = ponyDAO.findById(id);
+			if (!observeApresDestruction.isPresent()) {
+				return new Message("Élément supprimé", false);
+			} else {
 				throw new PonyCudException("Echec de l'opération, l'élément n'a pas été supprimé.");
 			}
-			
-		}else {
+
+		} else {
 			throw new PonyNotFoundException("L'élément que vous cherchez à supprimer n'a pas été trouvé.");
 		}
-		
-	}
 
+	}
 
 }

@@ -10,22 +10,24 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import littlePoneyBack.model.Race;
 
-public class RaceDAO implements CrudRepository<Race,Integer> {
+@Repository
+@Transactional
+public class RaceDAO  {
 	@PersistenceContext
 	EntityManager em;
 	
-	@Override
+	
 	public <S extends Race> S save(S entity) {
 		em.persist(entity);
 		
 		return entity;
 	}
-
-	@Override
+	
 	public <S extends Race> Iterable<S> saveAll(Iterable<S> entities) {
 		for (S entity : entities) {
 			em.persist(entity);
@@ -33,13 +35,13 @@ public class RaceDAO implements CrudRepository<Race,Integer> {
 		return entities;
 	}
 
-	@Override
+	
 	public Optional<Race> findById(Integer id) {
 		Optional<Race> o = Optional.ofNullable(em.find(Race.class, id));
 		return o;
 	}
 
-	@Override
+	
 	public boolean existsById(Integer id) {
 		Optional<Race> o = Optional.ofNullable(em.find(Race.class, id));
 		return o.isPresent();

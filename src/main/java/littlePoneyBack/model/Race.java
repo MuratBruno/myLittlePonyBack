@@ -1,13 +1,14 @@
 package littlePoneyBack.model;
 
-import java.util.Date;
+
+import java.sql.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Entity
 public class Race {
@@ -15,9 +16,12 @@ public class Race {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	private String location;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date date;
 	
-	@OneToMany
+	@ManyToMany(cascade=CascadeType.REMOVE)
+	@JoinTable(name="race_pony", joinColumns=@JoinColumn(name="race_id"), inverseJoinColumns=@JoinColumn(name="ponies_id"))
 	private List<Pony> ponies;
 
 	public Race() {
